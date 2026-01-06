@@ -1,0 +1,22 @@
+
+   {% extends "base.html" %}
+
+   {% block content %}
+        <h1>Hi, {{ user.username }}!</h1>
+
+        <h2>Recent Problem Solving Sessions</h2>
+        {% if sessions %}
+            {% for session in sessions %}
+                <div style="margin-bottom: 20px;">
+                    <h3>{{ session.date }}</h3>
+                    <p style="margin-left: 20px;">
+                        Solved {{ session.stats.total_problems }} problems
+                        in {{ session.stats.total_minutes }} minutes
+                        with {{ session.stats.avg_accuracy }}% accuracy
+                    </p>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No sessions yet</p>
+        {% endif %}
+    {% endblock %}

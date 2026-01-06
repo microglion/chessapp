@@ -1,0 +1,15 @@
+<!doctype html>
+<html>
+    <head>
+        {% if title %}
+        <title>{{ title }} - Chessapp</title>
+        {% else %}
+        <title> Welcome to Chessapp</title>
+        {% endif %}
+    </head>
+    <body>
+        <div>Chessapp: <a href="/index">Home</a></div>
+        <hr>
+        {% block content %}{% endblock %}
+    </body>
+</html>

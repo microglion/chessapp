@@ -1,0 +1,22 @@
+{
+    // Pylance memory optimization settings
+    "python.analysis.typeCheckingMode": "off",
+    "python.analysis.indexing": false,
+    "python.analysis.exclude": [
+        "**/venv/**",
+        "**/__pycache__/**",
+        "**/node_modules/**"
+    ],
+    // Keep these helpful features enabled
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.autoSearchPaths": true,
+    // Reduce diagnostic scope
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportUnusedImport": "none",
+        "reportUnusedVariable": "none"
+    },
+    // Disable auto-formatting for HTML files
+    "[html]": {
+        "editor.formatOnSave": false
+    }
+}
