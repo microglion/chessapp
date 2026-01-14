@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block content %}
+<style>
+    .keyboard {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        max-width: 800px;
+    }
+    .keyboard-row {
+        display: flex;
+        gap: 5px;
+        margin-bottom:  5px;
+    }
+    .keyboard-row button {
+        flex: 1;
+        padding: 10px;
+        font-size: 16px;
+    }
+    #moveInput {
+        width: 100%;
+        max-width: 800px;
+        box-sizing: border-box;
+    }
+
+</style>
+
+<h2>Puzzle #{{ puzzle_number }}</h2>
+
+<textarea id="moveInput" rows="6" cols="70" placeholder=
+        "Enter your analysis..."></textarea>
+
+<div class="keyboard">
+    <div class="keyboard-row">
+        <button onclick="insertText('K')">K</button>
+        <button onclick="insertText('Q')">Q</button>
+        <button onclick="insertText('R')">R</button>
+        <button onclick="insertText('B')">B</button>
+        <button onclick="insertText('N')">N</button>
+        <button onclick="insertText('x')">x</button>
+        <button onclick="insertText('+')">+</button>
+        <button onclick="insertText('\n')">Enter</button>
+    </div>
+    <div class="keyboard-row">
+        <button onclick="insertText('a')">a</button>
+        <button onclick="insertText('b')">b</button>
+        <button onclick="insertText('c')">c</button>
+        <button onclick="insertText('d')">d</button>
+        <button onclick="insertText('e')">e</button>
+        <button onclick="insertText('f')">f</button>
+        <button onclick="insertText('g')">g</button>
+        <button onclick="insertText('h')">h</button>
+    </div>
+    <div class="keyboard-row">
+        <button onclick="insertText('1')">1</button>
+        <button onclick="insertText('2')">2</button>
+        <button onclick="insertText('3')">3</button>
+        <button onclick="insertText('4')">4</button>
+        <button onclick="insertText('5')">5</button>
+        <button onclick="insertText('6')">6</button>
+        <button onclick="insertText('7')">7</button>
+        <button onclick="insertText('8')">8</button>
+    </div>
+    <div class="keyboard-row">
+        <button onclick="insertText('#')">#</button>
+        <button onclick="insertText('?')">?</button>
+        <button onclick="insertText('!')">!</button>
+        <button onclick="insertText('=')">=</button>
+        <button onclick="insertText('-')">-</button>
+        <button onclick="insertText(' ')">Space</button>
+        <button onclick="deleteLastChar()">Backspace</button>
+    </div>
+</div>
+
+<script>
+    function insertText(char) {
+        document.getElementById('moveInput').value += char;
+    }
+    function deleteLastChar() {
+        let input = document.getElementById('moveInput');
+        input.value = input.value.slice(0, -1);
+    }
+    
+</script>
+{% endblock %}

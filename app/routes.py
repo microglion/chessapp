@@ -68,4 +68,6 @@ def login():
     return render_template('login.html', title='Sign In', form=form)
 
 
-    
+@app.route('/session')
+def session():
+    return render_template('session.html', puzzle_number=1)
