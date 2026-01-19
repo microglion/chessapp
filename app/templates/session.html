@@ -22,10 +22,30 @@
         max-width: 800px;
         box-sizing: border-box;
     }
+    .side-selector {
+        margin-bottom: 15px;
+    }
+    .side-selector button {
+        padding: 8px 16px;
+        margin-right: 10px;
+        font-size: 16px;
+
+    }
+    .side-selector button.selected {
+        background-color: #4CAF50;
+        color:white
+    }
 
 </style>
 
 <h2>Puzzle #{{ puzzle_number }}</h2>
+
+<div class="side-selector">
+    <button id="whiteToMove" onclick="SetSideToMove('white')">White to 
+        move</button>
+    <button id="blackToMove" onclick="SetSideToMove('black')">Black to 
+        move</button>
+</div>
 
 <textarea id="moveInput" rows="6" cols="70" placeholder=
         "Enter your analysis..."></textarea>
@@ -79,6 +99,16 @@
     function deleteLastChar() {
         let input = document.getElementById('moveInput');
         input.value = input.value.slice(0, -1);
+    }
+    function SetSideToMove(side) {
+        //store which side is to move
+        window.sideToMove = side;
+        // Remove 'selected' class from both buttons
+        document.getElementById('whiteToMove').classList.remove('selected');
+        document.getElementById('blackToMove').classList.remove('selected')
+        // Add 'selected' class to the clicked button 
+        document.getElementById(side + 'ToMove').classList.add('selected');
+        
     }
     
 </script>
