@@ -17,10 +17,15 @@
         padding: 10px;
         font-size: 16px;
     }
-    #moveInput {
+    .moves-display {
         width: 100%;
         max-width: 800px;
-        box-sizing: border-box;
+        min-height: 150px;
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin-bottom: 15px;
+        font-family: monospace;
+        font-size: 16px;
     }
     .side-selector {
         margin-bottom: 15px;
@@ -47,8 +52,9 @@
         move</button>
 </div>
 
-<textarea id="moveInput" rows="6" cols="70" placeholder=
-        "Enter your analysis..."></textarea>
+<div id="movesDisplay" class="moves-display">
+</div>
+
 
 <div class="keyboard">
     <div class="keyboard-row">
@@ -93,13 +99,70 @@
 </div>
 
 <script>
+    //track moves 
+    let moves = [];
+    let currentMove = '';
+    let inPrincipalVariation = true;
+
     function insertText(char) {
-        document.getElementById('moveInput').value += char;
+        if (char ===' ') {
+            if (currentMove.length > 0) {
+                moves.push(currentMove);
+                currentMove = '';
+            }
+            updateDisplay();
+        } else {
+            //add character to current move
+            currentMove += char;
+            updateDisplay()
+        }
+
     }
-    function deleteLastChar() {
-        let input = document.getElementById('moveInput');
-        input.value = input.value.slice(0, -1);
-    }
+    function updateDisplayInline() {
+        //Build the display text
+       let displayText = moves.join(' ');
+        //Add current work-in-progress move in grey
+        if (currentMove.length > 0) {
+            displayText += ' <span style="color: gray;">' + currentMove + 
+                '</span>';
+        }
+        document.getElementById('movesDisplay').innerHTML = displayText
+     }
+     function updateDisplay() {
+        if (inPrincipalVariation){
+            //Build two-column layout for PV
+            let html = '<div style="font-size: 18px;">';
+            let moveIndex = 0;
+            //Check if white or black moves first
+            let whiteFirst = (window.sideToMove === 'white');
+            let onWhiteMove = whiteFirst;
+            //Loop through moves creating rows
+            while (moveIndex < moves.length) {
+                html += '<div style="display: flex; margin-bottom: 5px;">'; 
+                // White's column
+                if (onWhiteMove && moveIndex < moves.length) {
+                    html += '<div style="width: 200px; padding: 5px;">' + 
+                        moves[moveIndex++] + '</div>'; 
+                } else {
+                    html += '<div style="width: 200px; padding: 5px;">'+
+                        '</div>';
+                }
+                if (!onWhiteMove && moveIndex < moves.length) {
+                    html += '<div style="width: 200px; padding: 5px;">' + 
+                        moves[moveIndex++] + '</div>';
+                } else {
+                     html += '<div style="width: 200px; padding: 5px;">'+
+                        '</div>';
+                }
+                onWhiteMove=!onWhiteMove;
+                html+='</div>';
+            }
+            html += '</div>';
+            document.getElementById('movesDisplay').innerHTML = html;
+
+        }
+     }
+
     function SetSideToMove(side) {
         //store which side is to move
         window.sideToMove = side;
@@ -108,7 +171,7 @@
         document.getElementById('blackToMove').classList.remove('selected')
         // Add 'selected' class to the clicked button 
         document.getElementById(side + 'ToMove').classList.add('selected');
-        
+
     }
     
 </script>
