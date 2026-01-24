@@ -143,6 +143,7 @@
                 if (onWhiteMove && moveIndex < moves.length) {
                     html += '<div style="width: 200px; padding: 5px;">' + 
                         moves[moveIndex++] + '</div>'; 
+                        updateDisplayInline()
                 } else {
                     html += '<div style="width: 200px; padding: 5px;">'+
                         '</div>';
@@ -150,6 +151,7 @@
                 if (!onWhiteMove && moveIndex < moves.length) {
                     html += '<div style="width: 200px; padding: 5px;">' + 
                         moves[moveIndex++] + '</div>';
+                        updateDisplayInline()
                 } else {
                      html += '<div style="width: 200px; padding: 5px;">'+
                         '</div>';
