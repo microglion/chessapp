@@ -136,34 +136,45 @@
             //Check if white or black moves first
             let whiteFirst = (window.sideToMove === 'white');
             let onWhiteMove = whiteFirst;
-            //Loop through moves creating rows
-            while (moveIndex < moves.length) {
+
+            //first line first move decision
+            if (!onWhiteMove && moveIndex === 0) {
+                { 
+                    html += '<div style="width: 200px; padding: 5px;">'+
+                        '</div>';
+                
+                    html += '<div style="width: 200px; padding: 5px;">' + 
+                        moves[moveIndex++] + '</div>';
+                        
+                }
+                html+='</div>';
+                }
+                html += '</div>';
+                document.getElementById('movesDisplay').innerHTML = html;
+                }
+            else {
+                //Loop through moves creating rows from line 2 onwards when 
+                // black starts and line 1 when white starts
+                while (moveIndex < moves.length) {
                 html += '<div style="display: flex; margin-bottom: 5px;">'; 
                 // White's column
                 if (onWhiteMove && moveIndex < moves.length) {
                     html += '<div style="width: 200px; padding: 5px;">' + 
                         moves[moveIndex++] + '</div>'; 
-                        updateDisplayInline()
-                } else {
-                    html += '<div style="width: 200px; padding: 5px;">'+
-                        '</div>';
-                }
+                        onWhiteMove=!onWhiteMove;
+                } 
                 if (!onWhiteMove && moveIndex < moves.length) {
                     html += '<div style="width: 200px; padding: 5px;">' + 
                         moves[moveIndex++] + '</div>';
-                        updateDisplayInline()
-                } else {
-                     html += '<div style="width: 200px; padding: 5px;">'+
-                        '</div>';
-                }
-                onWhiteMove=!onWhiteMove;
+                         onWhiteMove=!onWhiteMove;
+                } 
                 html+='</div>';
             }
             html += '</div>';
             document.getElementById('movesDisplay').innerHTML = html;
-
+                }
         }
-     }
+     
 
     function SetSideToMove(side) {
         //store which side is to move
