@@ -135,46 +135,45 @@
             let moveIndex = 0;
             //Check if white or black moves first
             let whiteFirst = (window.sideToMove === 'white');
-            let onWhiteMove = whiteFirst;
-
-            //first line first move decision
-            if (!onWhiteMove && moveIndex === 0) {
-                { 
-                    html += '<div style="width: 200px; padding: 5px;">'+
-                        '</div>';
-                
-                    html += '<div style="width: 200px; padding: 5px;">' + 
-                        moves[moveIndex++] + '</div>';
-                        
-                }
-                html+='</div>';
-                }
-                html += '</div>';
-                document.getElementById('movesDisplay').innerHTML = html;
-                }
-            else {
-                //Loop through moves creating rows from line 2 onwards when 
-                // black starts and line 1 when white starts
-                while (moveIndex < moves.length) {
-                html += '<div style="display: flex; margin-bottom: 5px;">'; 
+            //Loop through moves creating rows
+            while (moveIndex < moves.length) {
+                html += '<div style="display: flex; margin-bottom: 5px;">';
                 // White's column
-                if (onWhiteMove && moveIndex < moves.length) {
-                    html += '<div style="width: 200px; padding: 5px;">' + 
-                        moves[moveIndex++] + '</div>'; 
-                        onWhiteMove=!onWhiteMove;
-                } 
-                if (!onWhiteMove && moveIndex < moves.length) {
-                    html += '<div style="width: 200px; padding: 5px;">' + 
-                        moves[moveIndex++] + '</div>';
-                         onWhiteMove=!onWhiteMove;
-                } 
+                if (whiteFirst) {
+                    html += '<div style="width: 200px; padding: 5px;">' +
+                        moves[moveIndex] + '</div>';
+                       
+                } else {
+                    //black moves first - first row is empty, others use 
+                    // moves[moveIndex]
+                    if (moveIndex === 0){
+                         html += '<div style="width: 200px; padding: 5px;' +
+                         '"></div>';
+                        } 
+                    else {
+                        html += '<div style="width: 200px; padding: 5px;">' +
+                            moves[moveIndex] + '</div>';
+                    }
+
+                }
+                // Black's column
+                if (!whiteFirst && moveIndex ===0) {
+                    html += '<div style="width: 200px; padding: 5px;">' +
+                        moves[moveIndex] + '</div>';
+                } else if (moveIndex + 1 < moves.length) {
+                    html += '<div style="width: 200px; padding: 5px;">' +
+                        moves[moveIndex+1] + '</div>';
+                } else {
+                     html += '<div style="width: 200px; padding: 5px;"></div>';
+                }
+                moveIndex+= (!whiteFirst && moveIndex ===0) ? 1 : 2;
                 html+='</div>';
             }
             html += '</div>';
             document.getElementById('movesDisplay').innerHTML = html;
-                }
+
         }
-     
+     }
 
     function SetSideToMove(side) {
         //store which side is to move

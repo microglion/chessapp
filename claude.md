@@ -18,25 +18,51 @@
 - **Active learning**: Ask questions to verify understanding as we go
 - **Test frequently**: Pause to test functionality as features are added
 
-## Session 2026-01-24: Fixing Two-Column Display Logic
+## Session 2026-01-25: Fixing Two-Column Display Logic
 
 ### What We Fixed
-- Bug: Moves displayed in staircase pattern (one move per row with empty opposite column)
-- Root cause: Logic used `onWhiteMove` toggle, filling only one column per iteration
-- Fix: Each loop iteration now grabs TWO moves (one for each column)
-- Simplified code by removing `onWhiteMove` and `whiteFirst` variables for now
-- Added bounds checking (`moveIndex < moves.length`) to handle odd number of moves
+- **Bug:** Moves displayed in staircase pattern (one move per row with empty opposite column)
+- **Root cause:** Logic used `onWhiteMove` toggle, filling only one column per iteration
+- **Solution:** Rewrote loop to grab TWO moves per iteration (one for each column)
+- Removed `onWhiteMove` variable - no longer needed
+- Added special handling for "black moves first" case (first row has empty white column)
+- Added proper bounds checking for odd number of moves
 
-### Key Learnings
-- **Tracing code execution**: Walking through loop iterations with actual values
-- **Bounds checking**: Prevent accessing array elements that don't exist
-- **Simplify first**: Started with "white always first" before handling edge cases
-- **Two if/else blocks**: Both run each iteration (not either/or like if/else if)
+### Key Learnings - JavaScript & Logic
+- **Ternary operator (`? :`)**: Shorthand for if/else - `condition ? valueIfTrue : valueIfFalse`
+- **Array indexing strategy**: Access `moves[moveIndex]` and `moves[moveIndex + 1]`, then increment by 2
+- **Post-increment timing**: Why `moves[moveIndex++]` wouldn't work when grabbing two values
+- **HTML structure in loops**: Each iteration must create complete row structure (both columns)
+- **State vs calculation**: `whiteFirst` never changes; used to determine column assignment
+- **Bounds checking edge cases**: `moveIndex + 1 < moves.length` protects against accessing non-existent moves
+- **Special case handling**: First row when black moves first needs different logic
+
+### The Fixed Logic
+**White moves first:**
+- Row 1: `moves[0]` | `moves[1]` → moveIndex += 2
+- Row 2: `moves[2]` | `moves[3]` → moveIndex += 2
+
+**Black moves first:**
+- Row 1: empty | `moves[0]` → moveIndex += 1
+- Row 2: `moves[1]` | `moves[2]` → moveIndex += 2
+- Row 3: `moves[3]` | `moves[4]` → moveIndex += 2
+
+### Problem-Solving Process
+- Started by trying to special-case first row before loop (Approach A)
+- Switched to handling everything inside loop (Approach B) - cleaner
+- Discovered div structure confusion - learned that BOTH columns must be created every iteration
+- Debugged through understanding why `whiteFirst` is constant vs `onWhiteMove` toggle
+- Fixed bounds checking for black column when only one move exists
+- Added conditional increment (1 for first black move row, 2 for all others)
 
 ### Next Steps
-- Add handling for "black moves first" case
-- Add gray work-in-progress text display (currentMove) while typing
+- Add gray work-in-progress text display (`currentMove`) while typing
 - Implement Backspace functionality
+- Add sideline/variation support (smaller font, continuous flow)
+- Promotion/demotion of variations
+- Timer (session + per-puzzle)
+- Navigation between puzzles
+- Save solutions to database
 
 ---
 
