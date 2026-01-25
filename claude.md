@@ -64,6 +64,13 @@
 - Navigation between puzzles
 - Save solutions to database
 
+### Completed
+- Virtual keyboard UI with chess pieces, files, ranks, symbols, controls
+- `/session` route and template
+- White/Black to move selector buttons
+- Two-column PV display (white left, black right)
+- Fixed staircase bug - loop now grabs two moves per iteration
+
 ---
 
 ## Session 2026-01-21: Two-Column Chess Notation Display
@@ -99,15 +106,6 @@
 - Learned by fixing own errors with feedback
 - Much more effective than being given code!
 
-### Next Steps
-- Add gray work-in-progress text display (currentMove) while typing
-- Implement Backspace functionality
-- Add sideline/variation support (smaller font, continuous flow)
-- Promotion/demotion of variations
-- Timer (session + per-puzzle)
-- Navigation between puzzles
-- Save solutions to database
-
 ## Session 2026-01-14: Virtual Keyboard UI
 
 ### What We Built
@@ -132,7 +130,7 @@
 - `getElementById()` returns the entire element object, not just values
 
 ### Environment Notes
-- Working on Windows PC (also has Mac setup)
-- Using PowerShell (execution policy set to RemoteSigned)
+- Uses both Windows PC and Mac (Mac more on weekends)
+- Windows: PowerShell, `venv\Scripts\activate`
+- Mac: Terminal, `source venv/bin/activate`
 - Flask app runs on port 5001
-- Virtual environment: `venv\Scripts\activate`

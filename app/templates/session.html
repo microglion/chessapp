@@ -7,16 +7,19 @@
         width: 100%;
         max-width: 800px;
     }
+
     .keyboard-row {
         display: flex;
         gap: 5px;
-        margin-bottom:  5px;
+        margin-bottom: 5px;
     }
+
     .keyboard-row button {
         flex: 1;
         padding: 10px;
         font-size: 16px;
     }
+
     .moves-display {
         width: 100%;
         max-width: 800px;
@@ -27,28 +30,30 @@
         font-family: monospace;
         font-size: 16px;
     }
+
     .side-selector {
         margin-bottom: 15px;
     }
+
     .side-selector button {
         padding: 8px 16px;
         margin-right: 10px;
         font-size: 16px;
 
     }
+
     .side-selector button.selected {
         background-color: #4CAF50;
-        color:white
+        color: white
     }
-
 </style>
 
 <h2>Puzzle #{{ puzzle_number }}</h2>
 
 <div class="side-selector">
-    <button id="whiteToMove" onclick="SetSideToMove('white')">White to 
+    <button id="whiteToMove" onclick="SetSideToMove('white')">White to
         move</button>
-    <button id="blackToMove" onclick="SetSideToMove('black')">Black to 
+    <button id="blackToMove" onclick="SetSideToMove('black')">Black to
         move</button>
 </div>
 
@@ -105,7 +110,7 @@
     let inPrincipalVariation = true;
 
     function insertText(char) {
-        if (char ===' ') {
+        if (char === ' ' || char === '\n') {
             if (currentMove.length > 0) {
                 moves.push(currentMove);
                 currentMove = '';
@@ -118,18 +123,9 @@
         }
 
     }
-    function updateDisplayInline() {
-        //Build the display text
-       let displayText = moves.join(' ');
-        //Add current work-in-progress move in grey
-        if (currentMove.length > 0) {
-            displayText += ' <span style="color: gray;">' + currentMove + 
-                '</span>';
-        }
-        document.getElementById('movesDisplay').innerHTML = displayText
-     }
-     function updateDisplay() {
-        if (inPrincipalVariation){
+
+    function updateDisplay() {
+        if (inPrincipalVariation) {
             //Build two-column layout for PV
             let html = '<div style="font-size: 18px;">';
             let moveIndex = 0;
@@ -142,49 +138,60 @@
                 if (whiteFirst) {
                     html += '<div style="width: 200px; padding: 5px;">' +
                         moves[moveIndex] + '</div>';
-                       
                 } else {
                     //black moves first - first row is empty, others use 
                     // moves[moveIndex]
-                    if (moveIndex === 0){
-                         html += '<div style="width: 200px; padding: 5px;' +
-                         '"></div>';
-                        } 
+                    if (moveIndex === 0) {
+                        html += '<div style="width: 200px; padding: 5px;' +
+                            '"></div>';
+                    }
                     else {
                         html += '<div style="width: 200px; padding: 5px;">' +
                             moves[moveIndex] + '</div>';
                     }
-
                 }
                 // Black's column
-                if (!whiteFirst && moveIndex ===0) {
+                if (!whiteFirst && moveIndex === 0) {
                     html += '<div style="width: 200px; padding: 5px;">' +
                         moves[moveIndex] + '</div>';
                 } else if (moveIndex + 1 < moves.length) {
                     html += '<div style="width: 200px; padding: 5px;">' +
-                        moves[moveIndex+1] + '</div>';
-                } else {
-                     html += '<div style="width: 200px; padding: 5px;"></div>';
+                        moves[moveIndex + 1] + '</div>';
+                } else if (currentMove.length>0) {
+                    html += '<div style="width: 200px; padding: 5px; color:' +
+                        ' gray;">' + currentMove + '</div>';
+                    } else {
+                    html += '<div style="width: 200px; padding: 5px;"></div>';
                 }
-                moveIndex+= (!whiteFirst && moveIndex ===0) ? 1 : 2;
-                html+='</div>';
+                    
+                moveIndex += (!whiteFirst && moveIndex === 0) ? 1 : 2;
+                html += '</div>';
             }
-            html += '</div>';
-            document.getElementById('movesDisplay').innerHTML = html;
+            let iswhitesTurn = (whiteFirst && moves.length % 2 === 0) ||
+                    (!whiteFirst && moves.length % 2 === 1);
+            if (iswhitesTurn && currentMove.length > 0) {
+                html += '<div style="display: flex; margin-bottom: 5px;">';
+                html += '<div style="width: 200px; padding: 5px; color:' +
+                        'gray;">' + currentMove + '</div>';
+                } 
+                html += '</div>';
+            }
+                html += '</div>';
+                document.getElementById('movesDisplay').innerHTML = html;
 
         }
-     }
-
-    function SetSideToMove(side) {
-        //store which side is to move
-        window.sideToMove = side;
-        // Remove 'selected' class from both buttons
-        document.getElementById('whiteToMove').classList.remove('selected');
-        document.getElementById('blackToMove').classList.remove('selected')
-        // Add 'selected' class to the clicked button 
-        document.getElementById(side + 'ToMove').classList.add('selected');
 
     }
-    
+        function SetSideToMove(side) {
+            //store which side is to move
+            window.sideToMove = side;
+            // Remove 'selected' class from both buttons
+            document.getElementById('whiteToMove').classList.remove('selected');
+            document.getElementById('blackToMove').classList.remove('selected')
+            // Add 'selected' class to the clicked button 
+            document.getElementById(side + 'ToMove').classList.add('selected');
+
+        }
+
 </script>
 {% endblock %}
