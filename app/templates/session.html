@@ -173,15 +173,15 @@
                 html += '<div style="display: flex; margin-bottom: 5px;">';
                 html += '<div style="width: 200px; padding: 5px; color:' +
                         'gray;">' + currentMove + '</div>';
+                html += '</div>';
                 } 
                 html += '</div>';
-            }
-                html += '</div>';
                 document.getElementById('movesDisplay').innerHTML = html;
+            }
+                
 
         }
-
-    }
+    
         function SetSideToMove(side) {
             //store which side is to move
             window.sideToMove = side;
@@ -192,6 +192,13 @@
             document.getElementById(side + 'ToMove').classList.add('selected');
 
         }
+        function deleteLastChar(){
+            if (currentMove.length > 0) {
+                currentMove = currentMove.slice(0,-1);
+                updateDisplay();
+            }
+        }
+        
 
 </script>
 {% endblock %}

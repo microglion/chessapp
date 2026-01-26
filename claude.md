@@ -8,6 +8,7 @@
 - **Feedback loop**: Costa shows code → Claude gives feedback → Costa fixes it → Repeat
 - **Explanations when needed**: Deep explanations of concepts, but Costa does the implementation
 - **No spoon-feeding**: Claude guides and corrects, but doesn't write the code for Costa
+- **No hints until asked**: Don't give hints, pseudocode, or implementation details until Costa is stuck and explicitly asks for help
 
 **Previous approach (kept for reference):**
 - ~~Code in small chunks: Max 2-3 lines at a time~~ → Now Costa writes the chunks
@@ -17,6 +18,56 @@
 - **Understanding first**: Ensure full understanding before moving to next step
 - **Active learning**: Ask questions to verify understanding as we go
 - **Test frequently**: Pause to test functionality as features are added
+
+## Session 2026-01-26: Grey Text, Backspace & Brace Debugging
+
+### What We Built
+- **Enter button functional**: Now works same as Space for submitting moves
+- **Grey work-in-progress text**: Shows `currentMove` while typing, before submission
+- Grey text appears in correct column based on whose turn it is
+- **Backspace functionality**: `deleteLastChar()` removes last character from `currentMove`
+
+### Key Learnings - JavaScript & Logic
+- **OR operator (`||`)**: `char === ' ' || char === '\n'` - true if either condition is true
+- **`innerHTML` rebuilds completely**: Every `updateDisplay()` call replaces entire content, not appending
+- **Modulo for turn detection**: `moves.length % 2` determines whose turn based on move count
+- **`iswhitesTurn` calculation**: `(whiteFirst && moves.length % 2 === 0) || (!whiteFirst && moves.length % 2 === 1)`
+- **Brace matching**: Hardest part of session - mismatched braces caused "html is not defined" errors
+- **Combining conditions**: Move variable definition before `if` to use in condition (`if (iswhitesTurn && currentMove.length > 0)`)
+- **`slice()` returns new value**: `slice()` doesn't modify the original string - must assign result back (`currentMove = currentMove.slice(0,-1)`)
+- **Strings are immutable**: Unlike arrays, string methods return new strings rather than modifying in place
+
+### The Two-Part Grey Text Solution
+1. **Inside while loop** (lines 155-157): Handles black's grey text - appears in same row as white's committed move
+2. **Post-loop section** (lines 165-172): Handles white's grey text - creates new row when no moves exist yet or after black's move
+
+### Problem-Solving Process
+- Started by understanding the flow: `insertText()` → `updateDisplay()` → rebuilds entire HTML
+- First attempt put grey text after while loop - appeared in wrong position
+- **Approach A**: Grey text on new row for black's turn (jumpy)
+- **Approach B**: Grey text inside while loop for black's turn (cleaner - keeps it in same row)
+- Multiple brace debugging sessions - learned to trace closing braces carefully
+- Final cleanup: moved `iswhitesTurn` before if statement to combine with `currentMove.length > 0`
+
+### Next Steps
+- Extend backspace to confirmed moves: when `currentMove` is empty, pop last move from `moves` array into `currentMove` for editing
+- Add sideline/variation support (smaller font, continuous flow)
+- Promotion/demotion of variations
+- Timer (session + per-puzzle)
+- Navigation between puzzles
+- Save solutions to database
+
+### Completed
+- Virtual keyboard UI with chess pieces, files, ranks, symbols, controls
+- `/session` route and template
+- White/Black to move selector buttons
+- Two-column PV display (white left, black right)
+- Fixed staircase bug - loop now grabs two moves per iteration
+- Enter button functional (same as Space)
+- Grey work-in-progress text for `currentMove` while typing
+- Backspace functionality for `currentMove`
+
+---
 
 ## Session 2026-01-25: Fixing Two-Column Display Logic
 
@@ -46,30 +97,6 @@
 - Row 1: empty | `moves[0]` → moveIndex += 1
 - Row 2: `moves[1]` | `moves[2]` → moveIndex += 2
 - Row 3: `moves[3]` | `moves[4]` → moveIndex += 2
-
-### Problem-Solving Process
-- Started by trying to special-case first row before loop (Approach A)
-- Switched to handling everything inside loop (Approach B) - cleaner
-- Discovered div structure confusion - learned that BOTH columns must be created every iteration
-- Debugged through understanding why `whiteFirst` is constant vs `onWhiteMove` toggle
-- Fixed bounds checking for black column when only one move exists
-- Added conditional increment (1 for first black move row, 2 for all others)
-
-### Next Steps
-- Add gray work-in-progress text display (`currentMove`) while typing
-- Implement Backspace functionality
-- Add sideline/variation support (smaller font, continuous flow)
-- Promotion/demotion of variations
-- Timer (session + per-puzzle)
-- Navigation between puzzles
-- Save solutions to database
-
-### Completed
-- Virtual keyboard UI with chess pieces, files, ranks, symbols, controls
-- `/session` route and template
-- White/Black to move selector buttons
-- Two-column PV display (white left, black right)
-- Fixed staircase bug - loop now grabs two moves per iteration
 
 ---
 
