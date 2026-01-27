@@ -105,24 +105,39 @@
 
 <script>
     //track moves 
-    let moves = [];
+    let rootNode = null;
+    let activeNode = null;
+    
+    
+    //moves = [];
     let currentMove = '';
     let inPrincipalVariation = true;
 
     function insertText(char) {
         if (char === ' ' || char === '\n') {
             if (currentMove.length > 0) {
-                moves.push(currentMove);
-                currentMove = '';
-            }
-            updateDisplay();
-        } else {
-            //add character to current move
+                let node = createNode(currentMove, activeNode ? activeNode: null);
+                if (rootNode === null){
+                    rootNode = node;
+                    activeNode = node;
+                    currentMove = '';
+                    updateDisplay()
+                } else { 
+                    activeNode.children.push(node);
+                    activeNode = node;
+                    currentMove = '';
+                    updateDisplay()
+                    }
+                }
+               
+            } else {
+           //add character to current move
             currentMove += char;
             updateDisplay()
         }
-
     }
+
+
 
     function updateDisplay() {
         if (inPrincipalVariation) {
@@ -197,7 +212,33 @@
                 currentMove = currentMove.slice(0,-1);
                 updateDisplay();
             }
+            else {
+                currentMove = moves.pop()
+                updateDisplay()
+            }
         }
+         function createNode(move, parent = null) {
+            let node = {
+                move: move,
+                parent:parent,
+                children: []
+            }
+            return node;
+         }
+         function createNodes(moves){
+            let nodes = []
+            
+            for (let i = 0; i < moves.length; i++) {
+                var move = moves[i];
+                let node = createNode(move, i > 0 ? nodes[i-1] : null);
+                nodes.push(node);
+                if (i>0){
+                    nodes[i-1].children.push(node)
+                }
+            }
+                
+            return nodes;
+         }
         
 
 </script>

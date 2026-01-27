@@ -7,8 +7,8 @@
 - **Struggle is learning**: Making mistakes and debugging them is where real learning happens
 - **Feedback loop**: Costa shows code → Claude gives feedback → Costa fixes it → Repeat
 - **Explanations when needed**: Deep explanations of concepts, but Costa does the implementation
-- **No spoon-feeding**: Claude guides and corrects, but doesn't write the code for Costa
-- **No hints until asked**: Don't give hints, pseudocode, or implementation details until Costa is stuck and explicitly asks for help
+- **NEVER provide code or pseudocode**: Even when Costa is stuck and asks for it - instead, help figure it out through questions and explanations
+- **Guide, don't solve**: Point out what's wrong, explain concepts, but let Costa write every line
 
 **Previous approach (kept for reference):**
 - ~~Code in small chunks: Max 2-3 lines at a time~~ → Now Costa writes the chunks
@@ -18,6 +18,63 @@
 - **Understanding first**: Ensure full understanding before moving to next step
 - **Active learning**: Ask questions to verify understanding as we go
 - **Test frequently**: Pause to test functionality as features are added
+
+## Session 2026-01-27: Tree Structure & Converting to Nodes
+
+### What We Built
+- **Extended backspace**: When `currentMove` is empty, backspace pops last move from `moves[]` array into `currentMove` for editing
+- **Tree structure functions**: `createNode()` creates node objects with move, parent, children properties
+- **Array-to-tree converter**: `createNodes()` converts linear `moves[]` array into linked tree structure
+- **Started tree conversion**: Modified `insertText()` to create nodes instead of pushing to array
+- Tested tree structure in browser console - explored parent/child relationships
+
+### Key Learnings - JavaScript Fundamentals
+- **`let` keyword**: JavaScript requires `let` (or `var`/`const`) to declare variables, unlike Python
+- **Capturing return values**: Must store function results with `let node = createNode(...)` or they're lost
+- **Variable scope/shadowing**: Using `let` inside a block creates a NEW local variable, doesn't update outer one
+- **Assignment direction**: `rootNode = node` assigns node TO rootNode (left side gets the value)
+- **References in JavaScript**: Multiple variables can point to same object (like Python, not C pointers)
+- **Browser console**: JavaScript's interactive environment like Python's terminal - can test code live
+- **Array methods**: `pop()` is array method, not string method
+- **Object properties**: Access with dot notation (`node.parent`, `node.children[0]`)
+
+### Tree Structure Concepts
+- **Nodes**: Objects containing move text, parent reference, children array
+- **Parent/child links**: Navigate via references, not sequential storage like arrays
+- **Root node**: First node with no parent (`parent: null`)
+- **Active node**: Tracks current position in tree for adding new moves
+- **Tree traversal**: Follow `node.children[0]` to go forward, `node.parent` to go back
+
+### Code Changes
+**Variables (lines 108-109):**
+```javascript
+let rootNode = null;  // First node in tree
+let activeNode = null;  // Current position for adding moves
+```
+
+**insertText() function (lines 116-138):**
+- Creates new node when move is submitted (space/enter)
+- First move: sets both `rootNode` and `activeNode` to new node
+- Subsequent moves: adds to `activeNode.children[]`, then updates `activeNode` to new node
+- Clears `currentMove` and calls `updateDisplay()` after each submission
+
+### Where We Stopped
+- `insertText()` successfully creates and links nodes ✓
+- `updateDisplay()` still uses old `moves[]` array ✗
+- Need to rewrite `updateDisplay()` to walk tree structure starting from `rootNode`
+
+### Next Steps
+- Rewrite `updateDisplay()` to traverse tree instead of looping through array
+- Walk from `rootNode` following `children[0]` for main line
+- Handle grey text for `currentMove` in tree context
+- Once working, can add variation support (multiple children)
+
+### Session Notes
+- Much tougher session - learning fundamental JavaScript while implementing trees
+- Struggled with: variable declaration, return values, scope, assignment direction
+- Reinforced that doing it yourself (vs watching) is where real learning happens
+
+---
 
 ## Session 2026-01-26: Grey Text, Backspace & Brace Debugging
 
@@ -50,12 +107,14 @@
 - Final cleanup: moved `iswhitesTurn` before if statement to combine with `currentMove.length > 0`
 
 ### Next Steps
-- Extend backspace to confirmed moves: when `currentMove` is empty, pop last move from `moves` array into `currentMove` for editing
 - Add sideline/variation support (smaller font, continuous flow)
 - Promotion/demotion of variations
 - Timer (session + per-puzzle)
 - Navigation between puzzles
 - Save solutions to database
+
+### Future Improvements (Someday/Maybe)
+- Improve backspace UX for deleting multiple moves: currently each popped move turns gray before deletion; consider hold-to-delete or direct deletion options
 
 ### Completed
 - Virtual keyboard UI with chess pieces, files, ranks, symbols, controls
@@ -66,6 +125,9 @@
 - Enter button functional (same as Space)
 - Grey work-in-progress text for `currentMove` while typing
 - Backspace functionality for `currentMove`
+- Extended backspace - pops confirmed moves back for editing
+- Tree structure functions (`createNode()`, `createNodes()`)
+- Converted `insertText()` to use tree nodes (in progress)
 
 ---
 
