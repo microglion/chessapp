@@ -107,11 +107,10 @@
     //track moves 
     let rootNode = null;
     let activeNode = null;
-    
-    
-    //moves = [];
     let currentMove = '';
     let inPrincipalVariation = true;
+    window.sideToMove = 'white'
+    document.getElementById('whiteToMove').classList.add('selected');
 
     function insertText(char) {
         if (char === ' ' || char === '\n') {
@@ -137,12 +136,17 @@
         }
     }
 
-
-
     function updateDisplay() {
         if (inPrincipalVariation) {
             //Build two-column layout for PV
             let html = '<div style="font-size: 18px;">';
+            let moves = [];
+            let currentNode = rootNode;
+            while (currentNode) {
+                moves.push(currentNode.move);
+                currentNode = currentNode.children[0] 
+            } 
+
             let moveIndex = 0;
             //Check if white or black moves first
             let whiteFirst = (window.sideToMove === 'white');
@@ -189,9 +193,17 @@
                 html += '<div style="width: 200px; padding: 5px; color:' +
                         'gray;">' + currentMove + '</div>';
                 html += '</div>';
-                } 
-                html += '</div>';
-                document.getElementById('movesDisplay').innerHTML = html;
+                } else if (!iswhitesTurn && moves.length === 0) {
+                    html += '<div style="display: flex; margin-bottom: 5px;">';
+                    html += '<div style="width: 200px; padding: 5px; color:' +
+                        'gray;"></div>';    
+                    html += '<div style="width: 200px; padding: 5px; color:' +
+                        'gray;">' + currentMove + '</div>';
+                    html += '</div>';
+
+                }
+            html += '</div>';
+            document.getElementById('movesDisplay').innerHTML = html;
             }
                 
 
@@ -213,7 +225,18 @@
                 updateDisplay();
             }
             else {
-                currentMove = moves.pop()
+                currentMove = activeNode.move;
+                
+                if(activeNode === rootNode) {
+                    activeNode = null;
+                    rootNode = null;
+                }else{
+                activeNode.parent.children.pop()
+                activeNode = activeNode.parent;
+
+                }
+               
+
                 updateDisplay()
             }
         }

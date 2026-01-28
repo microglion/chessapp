@@ -9,6 +9,9 @@
 - **Explanations when needed**: Deep explanations of concepts, but Costa does the implementation
 - **NEVER provide code or pseudocode**: Even when Costa is stuck and asks for it - instead, help figure it out through questions and explanations
 - **Guide, don't solve**: Point out what's wrong, explain concepts, but let Costa write every line
+- **NO CODE SNIPPETS**: Don't show example code like `variable = value` or `if (condition) {...}` - describe what needs to happen in words, use questions to guide discovery
+- **Encourage conceptual exploration**: When Costa asks "how does this work?" or explores tangents about code execution, flow, definitions, etc. - answer fully and don't redirect back to task. These explorations build understanding and are valuable for learning. This is a teaching context, not a production environment.
+- **This applies to EVERY session**: Check this file at start of each session to remember this approach
 
 **Previous approach (kept for reference):**
 - ~~Code in small chunks: Max 2-3 lines at a time~~ → Now Costa writes the chunks
@@ -19,55 +22,96 @@
 - **Active learning**: Ask questions to verify understanding as we go
 - **Test frequently**: Pause to test functionality as features are added
 
+## Session 2026-01-28: Finishing Tree Conversion & Grey Text Fixes
+
+**TEACHING APPROACH REMINDER:**
+- ABSOLUTELY NO code snippets in responses - describe in words what needs to happen
+- When Costa asks exploratory/conceptual questions about how code flows, execution order, definitions, etc. - ANSWER THEM FULLY
+- Don't redirect back to task when exploring concepts - this is a learning environment, tangents build understanding
+- The goal is understanding, not just completing features
+
+### What We Built
+- **Completed tree conversion**: updateDisplay() now walks tree structure instead of using array
+- **Tree traversal for display**: Builds temporary moves array from tree by following first child
+- **Set white as default**: Page loads with white selected and sideToMove variable set to white
+- **Fixed grey text bugs**: All scenarios now work correctly (white first move, black first move, black subsequent moves)
+
+### Key Learnings - Debugging & Code Structure
+- **Tracing brace matching**: Learning to find where code blocks (while loops, if statements) actually end
+- **Code inside vs outside loops**: Understanding when code runs during loop vs after loop completes
+- **When loops run**: while condition runs when condition is true - if array length is 0, condition is false, loop doesn't run
+- **Multiple cases for same feature**: Grey text handled in two places - inside loop for black's subsequent moves, outside loop for black's first move
+
+### Grey Text Implementation Details
+**Inside while loop:**
+- Handles black's grey text when white has already moved
+- Part of the black column logic: check if next move exists, else check if currentMove exists, else empty div
+
+**Outside while loop:**
+- Handles black's FIRST move only (when no moves exist yet and it's black's turn)
+- Creates new row with empty white column and grey black column
+
+### Code Changes
+**Default side-to-move:**
+- Set sideToMove variable to white on page load
+- Add selected class to white button by default
+
+**updateDisplay() function:**
+- Walk tree to build temporary moves array
+- While loop processes moves into two-column display
+- Handle grey text for work-in-progress move
+
+### Session Notes
+- Continuation from previous session after context limit
+- Lots of confusion about line numbers and where code blocks end
+- Important lesson: always verify actual code structure before debugging
+- Grey text now works in all three scenarios correctly
+- Emphasized importance of answering conceptual/exploratory questions to build understanding
+
+### Next Steps
+- Add active cell highlighting (visual indicator of where next move will go)
+- Then tackle variations/sidelines support (the big feature)
+
 ## Session 2026-01-27: Tree Structure & Converting to Nodes
 
 ### What We Built
-- **Extended backspace**: When `currentMove` is empty, backspace pops last move from `moves[]` array into `currentMove` for editing
-- **Tree structure functions**: `createNode()` creates node objects with move, parent, children properties
-- **Array-to-tree converter**: `createNodes()` converts linear `moves[]` array into linked tree structure
-- **Started tree conversion**: Modified `insertText()` to create nodes instead of pushing to array
+- **Extended backspace**: When currentMove is empty, backspace pops last move into currentMove for editing
+- **Tree structure functions**: createNode() creates node objects with move, parent, children properties
+- **Array-to-tree converter**: createNodes() converts linear array into linked tree structure
+- **Started tree conversion**: Modified insertText() to create nodes instead of pushing to array
 - Tested tree structure in browser console - explored parent/child relationships
 
 ### Key Learnings - JavaScript Fundamentals
-- **`let` keyword**: JavaScript requires `let` (or `var`/`const`) to declare variables, unlike Python
-- **Capturing return values**: Must store function results with `let node = createNode(...)` or they're lost
-- **Variable scope/shadowing**: Using `let` inside a block creates a NEW local variable, doesn't update outer one
-- **Assignment direction**: `rootNode = node` assigns node TO rootNode (left side gets the value)
+- **let keyword**: JavaScript requires let to declare variables, unlike Python
+- **Capturing return values**: Must store function results or they're lost
+- **Variable scope/shadowing**: Using let inside a block creates a NEW local variable, doesn't update outer one
+- **Assignment direction**: variable equals value assigns value TO variable (left side gets the value)
 - **References in JavaScript**: Multiple variables can point to same object (like Python, not C pointers)
 - **Browser console**: JavaScript's interactive environment like Python's terminal - can test code live
-- **Array methods**: `pop()` is array method, not string method
-- **Object properties**: Access with dot notation (`node.parent`, `node.children[0]`)
+- **Array methods**: pop() is array method, not string method
+- **Object properties**: Access with dot notation
 
 ### Tree Structure Concepts
 - **Nodes**: Objects containing move text, parent reference, children array
 - **Parent/child links**: Navigate via references, not sequential storage like arrays
-- **Root node**: First node with no parent (`parent: null`)
+- **Root node**: First node with no parent
 - **Active node**: Tracks current position in tree for adding new moves
-- **Tree traversal**: Follow `node.children[0]` to go forward, `node.parent` to go back
+- **Tree traversal**: Follow first child to go forward, parent to go back
 
 ### Code Changes
-**Variables (lines 108-109):**
-```javascript
-let rootNode = null;  // First node in tree
-let activeNode = null;  // Current position for adding moves
-```
+**Variables:**
+- rootNode - First node in tree
+- activeNode - Current position for adding moves
 
-**insertText() function (lines 116-138):**
+**insertText() function:**
 - Creates new node when move is submitted (space/enter)
-- First move: sets both `rootNode` and `activeNode` to new node
-- Subsequent moves: adds to `activeNode.children[]`, then updates `activeNode` to new node
-- Clears `currentMove` and calls `updateDisplay()` after each submission
+- First move: sets both rootNode and activeNode to new node
+- Subsequent moves: adds to activeNode children, then updates activeNode to new node
+- Clears currentMove and calls updateDisplay() after each submission
 
 ### Where We Stopped
-- `insertText()` successfully creates and links nodes ✓
-- `updateDisplay()` still uses old `moves[]` array ✗
-- Need to rewrite `updateDisplay()` to walk tree structure starting from `rootNode`
-
-### Next Steps
-- Rewrite `updateDisplay()` to traverse tree instead of looping through array
-- Walk from `rootNode` following `children[0]` for main line
-- Handle grey text for `currentMove` in tree context
-- Once working, can add variation support (multiple children)
+- insertText() successfully creates and links nodes
+- Started converting updateDisplay() to use tree structure
 
 ### Session Notes
 - Much tougher session - learning fundamental JavaScript while implementing trees
@@ -106,28 +150,33 @@ let activeNode = null;  // Current position for adding moves
 - Multiple brace debugging sessions - learned to trace closing braces carefully
 - Final cleanup: moved `iswhitesTurn` before if statement to combine with `currentMove.length > 0`
 
-### Next Steps
-- Add sideline/variation support (smaller font, continuous flow)
-- Promotion/demotion of variations
-- Timer (session + per-puzzle)
-- Navigation between puzzles
-- Save solutions to database
+### Next Steps (Prioritized)
+1. **Active cell highlighting** - Visual indicator showing where next move will go
+2. **Variation/sideline support** - Multiple children per node, smaller font display, inline flow
+3. **Variation navigation** - Move between different branches in the tree
+4. **Promotion/demotion** - Change which variation is the main line
+5. **Timer** - Session timer + per-puzzle timer
+6. **Puzzle navigation** - Move between different puzzles
+7. **Database storage** - Save solutions to database
 
 ### Future Improvements (Someday/Maybe)
 - Improve backspace UX for deleting multiple moves: currently each popped move turns gray before deletion; consider hold-to-delete or direct deletion options
 
 ### Completed
 - Virtual keyboard UI with chess pieces, files, ranks, symbols, controls
-- `/session` route and template
-- White/Black to move selector buttons
+- /session route and template
+- White/Black to move selector buttons with white as default
 - Two-column PV display (white left, black right)
 - Fixed staircase bug - loop now grabs two moves per iteration
 - Enter button functional (same as Space)
-- Grey work-in-progress text for `currentMove` while typing
-- Backspace functionality for `currentMove`
+- Grey work-in-progress text for currentMove while typing
+- Grey text displays correctly in all scenarios (white/black first, subsequent moves)
+- Backspace functionality for currentMove
 - Extended backspace - pops confirmed moves back for editing
-- Tree structure functions (`createNode()`, `createNodes()`)
-- Converted `insertText()` to use tree nodes (in progress)
+- Tree structure fully implemented (createNode, createNodes functions)
+- Converted insertText() to use tree nodes
+- Converted updateDisplay() to walk tree structure
+- Tree traversal builds temporary array for display
 
 ---
 
