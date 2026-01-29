@@ -57,6 +57,11 @@
         move</button>
 </div>
 
+<div class="navigation buttons">
+    <button id="back" onclick="navigateBack()"> Move back</button>
+    <button id="forward" onclick="navigateForward()">Move forward</button>
+</div>
+
 <div id="movesDisplay" class="moves-display">
 </div>
 
@@ -108,9 +113,11 @@
     let rootNode = null;
     let activeNode = null;
     let currentMove = '';
+    let activeChildIndex = 0;
     let inPrincipalVariation = true;
     window.sideToMove = 'white'
     document.getElementById('whiteToMove').classList.add('selected');
+    updateDisplay()
 
     function insertText(char) {
         if (char === ' ' || char === '\n') {
@@ -177,10 +184,10 @@
                     html += '<div style="width: 200px; padding: 5px;">' +
                         moves[moveIndex + 1] + '</div>';
                 } else if (currentMove.length>0) {
-                    html += '<div style="width: 200px; padding: 5px; color:' +
+                    html += '<div style="width: 200px; padding: 5px; border: 2px solid blue; color:' +
                         ' gray;">' + currentMove + '</div>';
                     } else {
-                    html += '<div style="width: 200px; padding: 5px;"></div>';
+                    html += '<div style="width: 200px; padding: 5px; border: 2px solid blue; min-height: 22px;"></div>';
                 }
                     
                 moveIndex += (!whiteFirst && moveIndex === 0) ? 1 : 2;
@@ -188,16 +195,20 @@
             }
             let iswhitesTurn = (whiteFirst && moves.length % 2 === 0) ||
                     (!whiteFirst && moves.length % 2 === 1);
-            if (iswhitesTurn && currentMove.length > 0) {
+            if (iswhitesTurn) {
                 html += '<div style="display: flex; margin-bottom: 5px;">';
-                html += '<div style="width: 200px; padding: 5px; color:' +
-                        'gray;">' + currentMove + '</div>';
+                html += '<div style="width: 200px; padding: 5px; border: 2px solid blue; min-height: 22px; color:' +
+                        'gray;">'
+                        if (currentMove.length > 0) {
+                            html += currentMove
+                        }
+                html += '</div>';
                 html += '</div>';
                 } else if (!iswhitesTurn && moves.length === 0) {
                     html += '<div style="display: flex; margin-bottom: 5px;">';
                     html += '<div style="width: 200px; padding: 5px; color:' +
                         'gray;"></div>';    
-                    html += '<div style="width: 200px; padding: 5px; color:' +
+                    html += '<div style="width: 200px; padding: 5px; border: 2px solid blue; min-height: 22px; color:' +
                         'gray;">' + currentMove + '</div>';
                     html += '</div>';
 
@@ -206,7 +217,6 @@
             document.getElementById('movesDisplay').innerHTML = html;
             }
                 
-
         }
     
         function SetSideToMove(side) {
@@ -217,6 +227,7 @@
             document.getElementById('blackToMove').classList.remove('selected')
             // Add 'selected' class to the clicked button 
             document.getElementById(side + 'ToMove').classList.add('selected');
+            updateDisplay();
 
         }
         function deleteLastChar(){
@@ -235,11 +246,34 @@
                 activeNode = activeNode.parent;
 
                 }
-               
-
                 updateDisplay()
             }
+        function navigateBack(){
+            currentMove = '';
+            if (activeNode.parent){
+                activeNode = activeNode.parent;
+                
+
+            } else{
+            }
+            updateDisplay();
         }
+        function navigateForward(){
+            currentMove = '';
+            if (activeNode.children.length > 0) {
+                if (activeNode.children.length ===1) {
+                    activeNode = activeNode.children[0];
+                    
+                } else if (activeNode.children.length >1){
+                    if (activeChildIndex >= activeNode.children.length) {
+                        activeChildIndex = 0;
+                        }        
+                        activeNode = activeNode.children[activeChildIndex]
+                        activeChildIndex++;
+                }
+                updateDisplay();
+                }
+            }
          function createNode(move, parent = null) {
             let node = {
                 move: move,

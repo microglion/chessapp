@@ -22,6 +22,74 @@
 - **Active learning**: Ask questions to verify understanding as we go
 - **Test frequently**: Pause to test functionality as features are added
 
+## Session 2026-01-29: Navigation Buttons & Variation Planning
+
+**TEACHING APPROACH REMINDER:**
+- ABSOLUTELY NO code snippets in responses - describe in words what needs to happen
+- When Costa asks exploratory/conceptual questions about how code flows, execution order, definitions, etc. - ANSWER THEM FULLY
+- Don't redirect back to task when exploring concepts - this is a learning environment, tangents build understanding
+- The goal is understanding, not just completing features
+
+### What We Built
+- **Added activeChildIndex variable**: Tracks which child to navigate to when cycling through variations at fork points
+- **Back/Forward navigation buttons**: HTML buttons added near White/Black to move selector
+- **navigateBack() function**: Moves activeNode to parent, clears currentMove, updates display
+- **navigateForward() function**: Moves activeNode to child, with cycling logic for multiple children (variations)
+- **Tested basic functionality**: Navigation buttons work without errors
+
+### Key Learnings - Planning & JavaScript Concepts
+- **Plan mode**: Used plan mode to create comprehensive implementation plan for navigation and variations
+- **Function hoisting**: Function declarations can be called before they're defined in code (unlike function expressions)
+- **Parameter passing vs internal checks**: Functions should check conditions internally rather than receive parameters evaluated in HTML onclick
+- **Array bounds checking**: Need `>=` not `>` when checking if index equals array length
+- **Code readability**: Statements on same line work but hurt readability - one statement per line is better
+- **Empty arrays vs arrays with elements**: `children` array exists even when empty, so check `length > 0` not just existence
+- **Wrapping index logic**: Reset index to 0 before using it to access array, then increment for next time
+
+### Navigation Implementation
+**navigateBack():**
+- Clears currentMove
+- Checks if activeNode has parent
+- If yes: moves activeNode to parent
+- Calls updateDisplay() at end (whether moved or not)
+
+**navigateForward():**
+- Clears currentMove
+- Checks if activeNode has children (length > 0)
+- If 1 child: moves to that child
+- If multiple children: cycles through using activeChildIndex
+  - If activeChildIndex >= children.length: wraps to 0
+  - Sets activeNode to children[activeChildIndex]
+  - Increments activeChildIndex for next press
+- Calls updateDisplay() at end
+
+### Session Notes
+- Accidentally entered plan mode initially but found it useful for complex feature
+- Created detailed plan for navigation and variations with user design input
+- User confirmed preferences: display should show current variation path, cycling through children at forks
+- Many conceptual questions about function parameters, timing, and array indexing - all explored fully
+- Emphasized difference between code on same line (works but unclear) vs separate lines (better practice)
+
+### Next Steps (From Plan)
+**Phase 2: Modify updateDisplay()**
+- Build path from root to activeNode by walking up parent chain
+- Display moves along that path (current variation)
+- Continue from activeNode following first child
+- Track activeNode position for border placement
+
+**Phase 3: Modify insertText()**
+- Check if activeNode already has children when adding move
+- Loop through children to see if move already exists
+- If match: navigate to that child (don't create duplicate)
+- If no match: add as new child (automatic variation creation)
+
+**Phase 4: Testing**
+- Test navigation (back/forward with various scenarios)
+- Test automatic variation creation
+- Test edge cases (at root, at end, duplicates, etc.)
+
+---
+
 ## Session 2026-01-28: Finishing Tree Conversion & Grey Text Fixes
 
 **TEACHING APPROACH REMINDER:**
