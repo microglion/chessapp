@@ -22,6 +22,72 @@
 - **Active learning**: Ask questions to verify understanding as we go
 - **Test frequently**: Pause to test functionality as features are added
 
+## Session 2026-01-30: Phase 2 Complete - updateDisplay() with Navigation
+
+**TEACHING APPROACH REMINDER:**
+- ABSOLUTELY NO code snippets in responses - describe in words what needs to happen
+- When Costa asks exploratory/conceptual questions about how code flows, execution order, definitions, etc. - ANSWER THEM FULLY
+- Don't redirect back to task when exploring concepts - this is a learning environment, tangents build understanding
+- The goal is understanding, not just completing features
+
+### What We Built
+**Phase 2 Complete - updateDisplay() now tracks activeNode position:**
+- Walks UP from activeNode to root via parent chain, collecting moves
+- Reverses array to get root-to-activeNode order
+- Stores activeNodeIndex (position of activeNode in moves array) BEFORE adding continuation
+- Walks DOWN from activeNode following first children to add continuation moves
+- Border displays at activeNodeIndex + 1 (the cell AFTER current position)
+
+**Border Logic Implementation:**
+- White column: border if moveIndex === activeNodeIndex + 1
+- Black column: border if moveIndex === activeNodeIndex (because cell is at moveIndex + 1)
+- Post-loop sections: border only if moves.length === activeNodeIndex + 1 (at end of moves)
+- Fixed multiple brace mismatch bugs causing "html is not defined" errors
+
+### Key Learnings - Tree Traversal & Index Tracking
+- **Walking up vs down**: Parent chain goes up (toward root), children array goes down (toward leaves)
+- **reverse() mutates in place**: Array is modified, doesn't return new array
+- **Storing index at right moment**: activeNodeIndex must be captured after reverse but before adding continuation
+- **Null checks for fresh state**: When no moves exist, activeNode is null, forwardNode must be checked before accessing .children
+- **Off-by-one in columns**: White column index = moveIndex, Black column index = moveIndex + 1
+- **Conditional borders in post-loop**: Border should only show when at end of moves, not always
+
+### Known Limitation - First Move Navigation
+**Problem:** Border at activeNodeIndex + 1 means first cell (index 0) can never have border after first move entered
+- When at rootNode: activeNodeIndex = 0, border goes to cell 1
+- Can't navigate "before" first move to consider alternative first moves
+
+**Solution for next session:**
+1. Allow activeNode = null while rootNode still exists (represents "before first move")
+2. Modify navigateBack(): when at rootNode, set activeNode = null instead of doing nothing
+3. Modify forward traversal: if activeNode is null but rootNode exists, start from rootNode
+4. This makes activeNodeIndex = -1, so activeNodeIndex + 1 = 0 (border on first cell)
+5. Later: handle insertText() when activeNode is null but rootNode exists (alternative first moves)
+
+### Session Notes
+- Continued from context compaction - had to review summary of previous work
+- Long debugging session with many brace mismatch issues
+- User expressed feeling overwhelmed by complexity of updateDisplay() function
+- Successfully tested navigation - border moves correctly with back/forward buttons
+- Good stopping point with Phase 2 complete
+
+### Next Steps
+**Fix first move navigation (quick fix):**
+- Modify navigateBack() and updateDisplay() forward traversal as described above
+
+**Phase 3: Modify insertText() for variations**
+- Check if activeNode already has children when adding move
+- Loop through children to see if move already exists
+- If match: navigate to that child (don't create duplicate)
+- If no match: add as new child (automatic variation creation)
+
+**Phase 4: Testing**
+- Test navigation (all scenarios including first move)
+- Test automatic variation creation
+- Test edge cases
+
+---
+
 ## Session 2026-01-29: Navigation Buttons & Variation Planning
 
 **TEACHING APPROACH REMINDER:**
@@ -31,6 +97,13 @@
 - The goal is understanding, not just completing features
 
 ### What We Built
+**Active Cell Highlighting:**
+- Added minimum height (28px) to cells to prevent size changes when empty vs filled
+- Added border styling (2px solid blue) to show active cell where next move will go
+- Borders added in three locations: white's active cell (outside loop), black's first move (outside loop), black's subsequent moves (inside while loop)
+- Fixed issue where border only appeared when currentMove was populated - needed border on empty cells too
+
+**Navigation Buttons:**
 - **Added activeChildIndex variable**: Tracks which child to navigate to when cycling through variations at fork points
 - **Back/Forward navigation buttons**: HTML buttons added near White/Black to move selector
 - **navigateBack() function**: Moves activeNode to parent, clears currentMove, updates display
@@ -62,31 +135,6 @@
   - Sets activeNode to children[activeChildIndex]
   - Increments activeChildIndex for next press
 - Calls updateDisplay() at end
-
-### Session Notes
-- Accidentally entered plan mode initially but found it useful for complex feature
-- Created detailed plan for navigation and variations with user design input
-- User confirmed preferences: display should show current variation path, cycling through children at forks
-- Many conceptual questions about function parameters, timing, and array indexing - all explored fully
-- Emphasized difference between code on same line (works but unclear) vs separate lines (better practice)
-
-### Next Steps (From Plan)
-**Phase 2: Modify updateDisplay()**
-- Build path from root to activeNode by walking up parent chain
-- Display moves along that path (current variation)
-- Continue from activeNode following first child
-- Track activeNode position for border placement
-
-**Phase 3: Modify insertText()**
-- Check if activeNode already has children when adding move
-- Loop through children to see if move already exists
-- If match: navigate to that child (don't create duplicate)
-- If no match: add as new child (automatic variation creation)
-
-**Phase 4: Testing**
-- Test navigation (back/forward with various scenarios)
-- Test automatic variation creation
-- Test edge cases (at root, at end, duplicates, etc.)
 
 ---
 
@@ -245,6 +293,8 @@
 - Converted insertText() to use tree nodes
 - Converted updateDisplay() to walk tree structure
 - Tree traversal builds temporary array for display
+- Navigation buttons (Back/Forward) with cycling through variations at forks
+- Phase 2: updateDisplay() tracks activeNode position with moving border
 
 ---
 

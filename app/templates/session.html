@@ -148,12 +148,21 @@
             //Build two-column layout for PV
             let html = '<div style="font-size: 18px;">';
             let moves = [];
-            let currentNode = rootNode;
-            while (currentNode) {
-                moves.push(currentNode.move);
-                currentNode = currentNode.children[0] 
-            } 
-
+            let rewindNode = activeNode;
+            
+            while (rewindNode) {
+                moves.push(rewindNode.move);
+                rewindNode = rewindNode.parent;   
+            }   
+            moves.reverse()
+            activeNodeIndex = moves.length - 1;
+            let forwardNode = activeNode;
+            if (forwardNode) {
+                while (forwardNode.children.length >0) {
+                    forwardNode = forwardNode.children[0];
+                    moves.push(forwardNode.move);
+                }
+            }
             let moveIndex = 0;
             //Check if white or black moves first
             let whiteFirst = (window.sideToMove === 'white');
@@ -162,9 +171,14 @@
                 html += '<div style="display: flex; margin-bottom: 5px;">';
                 // White's column
                 if (whiteFirst) {
-                    html += '<div style="width: 200px; padding: 5px;">' +
+                    if(moveIndex===activeNodeIndex+1) {
+                    html += '<div style="width: 200px; padding: 5px; border: 2px solid blue ">' +
                         moves[moveIndex] + '</div>';
-                } else {
+                    } else {
+                    html += '<div style="width: 200px; padding: 5px; ">' +
+                        moves[moveIndex] + '</div>';
+                    }
+                }else {
                     //black moves first - first row is empty, others use 
                     // moves[moveIndex]
                     if (moveIndex === 0) {
@@ -172,23 +186,46 @@
                             '"></div>';
                     }
                     else {
-                        html += '<div style="width: 200px; padding: 5px;">' +
+                        if (moveIndex===activeNodeIndex+1) {
+                        html += '<div style="width: 200px; padding: 5px; border: 2px solid blue">' +
                             moves[moveIndex] + '</div>';
+                        }else {
+                            html += '<div style="width: 200px; padding: 5px; ">' +
+                            moves[moveIndex] + '</div>';
+                        } 
                     }
                 }
                 // Black's column
                 if (!whiteFirst && moveIndex === 0) {
+                    if (moveIndex===activeNodeIndex+1){
+                        html += '<div style="width: 200px; padding: 5px; border:2px solid blue">' +
+                        moves[moveIndex] + '</div>';
+                    }else{
                     html += '<div style="width: 200px; padding: 5px;">' +
                         moves[moveIndex] + '</div>';
-                } else if (moveIndex + 1 < moves.length) {
-                    html += '<div style="width: 200px; padding: 5px;">' +
-                        moves[moveIndex + 1] + '</div>';
-                } else if (currentMove.length>0) {
-                    html += '<div style="width: 200px; padding: 5px; border: 2px solid blue; color:' +
-                        ' gray;">' + currentMove + '</div>';
-                    } else {
-                    html += '<div style="width: 200px; padding: 5px; border: 2px solid blue; min-height: 22px;"></div>';
+                    }
                 }
+                else if (moveIndex + 1 < moves.length) {
+                    if (moveIndex===activeNodeIndex) {
+                         html += '<div style="width: 200px; padding: 5px; border:2px solid blue">' +
+                        moves[moveIndex + 1] + '</div>';
+                    } else {
+                         html += '<div style="width: 200px; padding: 5px; ">' +
+                        moves[moveIndex + 1] + '</div>';
+                    }
+                   
+                }else if (moveIndex ===activeNodeIndex) {
+
+                    if (currentMove.length>0) {
+                         html += '<div style="width: 200px; padding: 5px; border: 2px solid blue; color:' +
+                        ' gray;">' + currentMove + '</div>';
+                    }else {
+                    html += '<div style="width: 200px; padding: 5px; border: 2px solid blue; min-height: 22px;"></div>';
+                    }
+                }
+                else {
+                    html += '<div style="width: 200px; padding: 5px; min-height: 22px;"></div>'
+                }    
                     
                 moveIndex += (!whiteFirst && moveIndex === 0) ? 1 : 2;
                 html += '</div>';
@@ -197,22 +234,31 @@
                     (!whiteFirst && moves.length % 2 === 1);
             if (iswhitesTurn) {
                 html += '<div style="display: flex; margin-bottom: 5px;">';
-                html += '<div style="width: 200px; padding: 5px; border: 2px solid blue; min-height: 22px; color:' +
+                    if (moves.length===activeNodeIndex+1){
+                         html += '<div style="width: 200px; padding: 5px; border: 2px solid blue; min-height: 22px; color:' +
                         'gray;">'
                         if (currentMove.length > 0) {
                             html += currentMove
                         }
-                html += '</div>';
+                    html += '</div>';
+                    } else {
+                        html += '<div style="width: 200px; padding: 5px; min-height: 22px; color:' +
+                        'gray;">'
+                        if (currentMove.length > 0) {
+                            html += currentMove
+                        }
+                    html += '</div>';
+                    }
                 html += '</div>';
                 } else if (!iswhitesTurn && moves.length === 0) {
                     html += '<div style="display: flex; margin-bottom: 5px;">';
                     html += '<div style="width: 200px; padding: 5px; color:' +
                         'gray;"></div>';    
                     html += '<div style="width: 200px; padding: 5px; border: 2px solid blue; min-height: 22px; color:' +
-                        'gray;">' + currentMove + '</div>';
+                            'gray;">' + currentMove + '</div>';
                     html += '</div>';
-
-                }
+                        }
+                
             html += '</div>';
             document.getElementById('movesDisplay').innerHTML = html;
             }
@@ -244,10 +290,10 @@
                 }else{
                 activeNode.parent.children.pop()
                 activeNode = activeNode.parent;
-
                 }
                 updateDisplay()
             }
+        }
         function navigateBack(){
             currentMove = '';
             if (activeNode.parent){
