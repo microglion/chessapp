@@ -110,73 +110,97 @@
 
 <script>
     //track moves 
-    let rootNode = null;
-    let activeNode = null;
+    let virtualRoot = {
+        move:null,
+        parent: null,
+        children:[]
+                }
+    let activeNode = virtualRoot;
     let currentMove = '';
     let activeChildIndex = 0;
+    let sideline = [];
     let inPrincipalVariation = true;
     window.sideToMove = 'white'
     document.getElementById('whiteToMove').classList.add('selected');
     updateDisplay()
 
     function insertText(char) {
+        let moveFound = false;
         if (char === ' ' || char === '\n') {
             if (currentMove.length > 0) {
-                let node = createNode(currentMove, activeNode ? activeNode: null);
-                if (rootNode === null){
-                    rootNode = node;
-                    activeNode = node;
-                    currentMove = '';
-                    updateDisplay()
-                } else { 
+                for (let i=0; i<activeNode.children.length; i++) {
+                    if (currentMove===activeNode.children[i].move){
+                        activeNode = activeNode.children[i]
+                        moveFound = true;
+                        currentMove='';
+                        break;
+                    }
+                }
+            }
+            if (!moveFound) {
+                    let node = createNode(currentMove, activeNode);
                     activeNode.children.push(node);
                     activeNode = node;
                     currentMove = '';
-                    updateDisplay()
-                    }
-                }
-               
-            } else {
-           //add character to current move
-            currentMove += char;
-            updateDisplay()
+            }
+        } else {
+        //add character to current move
+        currentMove += char;   
         }
-    }
+        updateDisplay();
+        }
+    
 
     function updateDisplay() {
         if (inPrincipalVariation) {
             //Build two-column layout for PV
             let html = '<div style="font-size: 18px;">';
-            let moves = [];
+            let nodes = [];
             let rewindNode = activeNode;
-            
+            let sideline = [];
+
             while (rewindNode) {
-                moves.push(rewindNode.move);
-                rewindNode = rewindNode.parent;   
-            }   
-            moves.reverse()
-            activeNodeIndex = moves.length - 1;
-            let forwardNode = activeNode;
+                if (rewindNode.move){
+                    nodes.push(rewindNode);   
+                } 
+                rewindNode = rewindNode.parent;
+            }     
+            nodes.reverse()
+            activeNodeIndex = nodes.length - 1;
+            let forwardNode = activeNode
+            
             if (forwardNode) {
-                while (forwardNode.children.length >0) {
+                while (forwardNode.children.length>=1){
+                    if(forwardNode.children.length===1) {
+                   
+                    } else if (forwardNode.children.length >1) {
+                        for (let i=1; i<forwardNode.children.length; i++) {
+                            sideline.push({index: nodes.length, node: altNodes(forwardNode.children[i])});
+                        }
+                    
+                    }
                     forwardNode = forwardNode.children[0];
-                    moves.push(forwardNode.move);
+                    nodes.push(forwardNode);
+                }  
+               
                 }
-            }
+            
             let moveIndex = 0;
+
+            
             //Check if white or black moves first
             let whiteFirst = (window.sideToMove === 'white');
             //Loop through moves creating rows
-            while (moveIndex < moves.length) {
+            while (moveIndex < nodes.length) {
                 html += '<div style="display: flex; margin-bottom: 5px;">';
                 // White's column
                 if (whiteFirst) {
                     if(moveIndex===activeNodeIndex+1) {
                     html += '<div style="width: 200px; padding: 5px; border: 2px solid blue ">' +
-                        moves[moveIndex] + '</div>';
+                        nodes[moveIndex].move + '</div>';
                     } else {
                     html += '<div style="width: 200px; padding: 5px; ">' +
-                        moves[moveIndex] + '</div>';
+                        nodes[moveIndex].move + '</div>';
                     }
                 }else {
                     //black moves first - first row is empty, others use 
@@ -188,10 +212,10 @@
                     else {
                         if (moveIndex===activeNodeIndex+1) {
                         html += '<div style="width: 200px; padding: 5px; border: 2px solid blue">' +
-                            moves[moveIndex] + '</div>';
+                            nodes[moveIndex].move + '</div>';
                         }else {
                             html += '<div style="width: 200px; padding: 5px; ">' +
-                            moves[moveIndex] + '</div>';
+                            nodes[moveIndex].move + '</div>';
                         } 
                     }
                 }
@@ -199,23 +223,21 @@
                 if (!whiteFirst && moveIndex === 0) {
                     if (moveIndex===activeNodeIndex+1){
                         html += '<div style="width: 200px; padding: 5px; border:2px solid blue">' +
-                        moves[moveIndex] + '</div>';
+                        nodes[moveIndex].move + '</div>';
                     }else{
                     html += '<div style="width: 200px; padding: 5px;">' +
-                        moves[moveIndex] + '</div>';
+                        nodes[moveIndex].move + '</div>';
                     }
                 }
-                else if (moveIndex + 1 < moves.length) {
+                else if (moveIndex + 1 < nodes.length) {
                     if (moveIndex===activeNodeIndex) {
                          html += '<div style="width: 200px; padding: 5px; border:2px solid blue">' +
-                        moves[moveIndex + 1] + '</div>';
+                        nodes[moveIndex + 1].move + '</div>';
                     } else {
                          html += '<div style="width: 200px; padding: 5px; ">' +
-                        moves[moveIndex + 1] + '</div>';
-                    }
-                   
+                        nodes[moveIndex + 1].move + '</div>';
+                    } 
                 }else if (moveIndex ===activeNodeIndex) {
-
                     if (currentMove.length>0) {
                          html += '<div style="width: 200px; padding: 5px; border: 2px solid blue; color:' +
                         ' gray;">' + currentMove + '</div>';
@@ -226,15 +248,24 @@
                 else {
                     html += '<div style="width: 200px; padding: 5px; min-height: 22px;"></div>'
                 }    
-                    
-                moveIndex += (!whiteFirst && moveIndex === 0) ? 1 : 2;
                 html += '</div>';
+                if (sideline.length>0){
+                for (let i=0; i<sideline.length; i++) {
+                    if (sideline[i].index === moveIndex || sideline[i].index === moveIndex+1) {
+                        html += '<div style="display: flex; margin-bottom: 5px;">';
+                        html += '<div style="width: 200px; padding: 5px; min-height: 22px;">' + sideline[i].node + '</div>';
+                        html += '</div>';
+                    }
+                }
             }
-            let iswhitesTurn = (whiteFirst && moves.length % 2 === 0) ||
-                    (!whiteFirst && moves.length % 2 === 1);
+                moveIndex += (!whiteFirst && moveIndex === 0) ? 1 : 2;
+                
+            }
+            let iswhitesTurn = (whiteFirst && nodes.length % 2 === 0) ||
+                    (!whiteFirst && nodes.length % 2 === 1);
             if (iswhitesTurn) {
                 html += '<div style="display: flex; margin-bottom: 5px;">';
-                    if (moves.length===activeNodeIndex+1){
+                    if (nodes.length===activeNodeIndex+1){
                          html += '<div style="width: 200px; padding: 5px; border: 2px solid blue; min-height: 22px; color:' +
                         'gray;">'
                         if (currentMove.length > 0) {
@@ -250,7 +281,7 @@
                     html += '</div>';
                     }
                 html += '</div>';
-                } else if (!iswhitesTurn && moves.length === 0) {
+                } else if (!iswhitesTurn && nodes.length === 0) {
                     html += '<div style="display: flex; margin-bottom: 5px;">';
                     html += '<div style="width: 200px; padding: 5px; color:' +
                         'gray;"></div>';    
@@ -258,14 +289,13 @@
                             'gray;">' + currentMove + '</div>';
                     html += '</div>';
                         }
-                
             html += '</div>';
-            document.getElementById('movesDisplay').innerHTML = html;
-            }
-                
+            
+            document.getElementById('movesDisplay').innerHTML = html;     
         }
-    
-        function SetSideToMove(side) {
+    }
+
+    function SetSideToMove(side) {
             //store which side is to move
             window.sideToMove = side;
             // Remove 'selected' class from both buttons
@@ -276,40 +306,32 @@
             updateDisplay();
 
         }
+
         function deleteLastChar(){
             if (currentMove.length > 0) {
                 currentMove = currentMove.slice(0,-1);
-                updateDisplay();
             }
-            else {
+            else if (activeNode!==virtualRoot) {
                 currentMove = activeNode.move;
-                
-                if(activeNode === rootNode) {
-                    activeNode = null;
-                    rootNode = null;
-                }else{
                 activeNode.parent.children.pop()
                 activeNode = activeNode.parent;
                 }
-                updateDisplay()
+            updateDisplay();
             }
-        }
+
         function navigateBack(){
             currentMove = '';
-            if (activeNode.parent){
+            if (activeNode!==virtualRoot) {
                 activeNode = activeNode.parent;
-                
-
-            } else{
             }
             updateDisplay();
         }
+
         function navigateForward(){
             currentMove = '';
             if (activeNode.children.length > 0) {
                 if (activeNode.children.length ===1) {
-                    activeNode = activeNode.children[0];
-                    
+                    activeNode = activeNode.children[0];    
                 } else if (activeNode.children.length >1){
                     if (activeChildIndex >= activeNode.children.length) {
                         activeChildIndex = 0;
@@ -317,9 +339,10 @@
                         activeNode = activeNode.children[activeChildIndex]
                         activeChildIndex++;
                 }
-                updateDisplay();
-                }
             }
+            updateDisplay();
+            } 
+
          function createNode(move, parent = null) {
             let node = {
                 move: move,
@@ -328,6 +351,7 @@
             }
             return node;
          }
+
          function createNodes(moves){
             let nodes = []
             
@@ -338,11 +362,21 @@
                 if (i>0){
                     nodes[i-1].children.push(node)
                 }
-            }
-                
+            }   
             return nodes;
          }
+
+        function altNodes(node) {
+            let string = '';
+            string += node.move + ' ';
+            while (node.children.length > 0) {
+                node = node.children[0]
+                string += node.move + ' ';
+                }
+             return string;
+            }
         
+      
 
 </script>
 {% endblock %}
