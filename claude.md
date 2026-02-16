@@ -24,6 +24,38 @@
 - **Active learning**: Ask questions to verify understanding as we go
 - **Test frequently**: Pause to test functionality as features are added
 
+## Session 2026-02-15: Sideline Variations Display
+
+### Lichess-Style Variation Display (to implement next)
+When a fork has white variations (e.g. main line e4, alternatives d4/c4):
+- Main line row at fork: white column shows main move (e4), black column **empty**
+- Variation rows below: one row per alternative (d4 e5..., c4 e5...) each on its own row
+- Continuation row after variations: white column shows **"..."**, black column shows next main move (e5)
+
+When a fork has black variations (e.g. main line e5, alternatives d5/c5):
+- Main line row at fork: white column shows **"..."**, black column shows main move (e5)
+- Variation rows below: one row per alternative starting with the black alternative
+- Continuation continues normally
+
+This requires modifying the main display loop to detect when a sideline exists for the current row and change how that row is rendered.
+
+### What Was Built This Session
+- **virtualRoot refactor**: Replaced rootNode with virtualRoot (dummy parent node {move:null, parent:null, children:[]})
+- **Phase 3 insertText()**: Loops through activeNode.children to detect duplicate moves (navigates to existing child instead of creating duplicate)
+- **altNodes() function**: Takes a single child node, builds string of its move + continuation via children[0] chain
+- **sidelineChecker**: Separate pass after nodes array is fully built; walks entire main line from virtualRoot detecting forks; uses indexCounter for correct positioning; stores {index, color, node} per sideline
+- **Color detection**: indexCounter%2===0 → white fork, odd → black fork (whiteFirst assumption - needs fix for blackFirst)
+- **navigateForward() simplified**: Always goes to children[0], no more cycling
+- **Sideline display**: White sidelines show in white column; black sidelines show empty white column + black column
+
+### Known Issues / Next Steps
+- **Lichess-style main line row formatting** (described above): modify display loop when a fork exists at current row
+- **whiteFirst color bug**: sidelineChecker color calc assumes whiteFirst; needs to account for black-first games
+- **Clicking sidelines to navigate into them**: future feature
+- **altNode missing `let`**: check line ~369 in session.html for undeclared variable
+
+---
+
 ## Session 2026-01-30: Phase 2 Complete - updateDisplay() with Navigation
 
 **TEACHING APPROACH REMINDER:**
